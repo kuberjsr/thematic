@@ -62,52 +62,65 @@ if ( function_exists('childtheme_override_theme_setup') ) {
 
 		/**
 		 * Get Theme and Child Theme Data.
-		 * Credits: Joern Kretzschmar
 		 * 
 		 * Used to get title, version, author, URI of the parent and the child theme.
+		 * @todo: move wp_get_theme() directly to shortcodes and remove constants
 		 */
 		
 		// WordPress 3.4 
 		if ( function_exists( 'wp_get_theme' ) ) {
-			$frameworkData = wp_get_theme(  get_template_directory() . '/style.css' );
+			$frameworkData = wp_get_theme(  'thematic' );
+			$framework_version = trim( $frameworkData->display('Version', false));
+			$framework_title =  $frameworkData->display('Name', false);
+			$framework_author =  $frameworkData->display('Author', false);
+			$framework_themeuri =  $frameworkData->display('ThemeURI', false);
+			
+			$childthemeData = wp_get_theme();
+			$childtheme_version = trim( $childthemeData->display('Version', false) );
+			$childtheme_title =  $childthemeData->display('Name', false);
+			$childtheme_author =  $childthemeData->display('Author', false);
+			$childtheme_themeuri =  $childthemeData->display('ThemeURI', false);
+			
 		// WordPress 3.3
+		// Credits: Joern Kretzschmar
+
 		} else {
 			$frameworkData = get_theme_data(  get_template_directory() . '/style.css' );
+			$framework_version = trim( $frameworkData['Version'] );
+			$framework_title =  $frameworkData['Title'];
+			$framework_author =  $frameworkData['Author'];
+			$framework_themeuri =  $frameworkData['URI'];
+
+			$childthemeData = get_theme_data( get_stylesheet_directory() . '/style.css' );
+			$childtheme_version = trim( $childthemeData['Version'] );
+			$childtheme_title =  $childthemeData['Name'];
+			$childtheme_author =  $childthemeData['Author'];
+			$childtheme_themeuri =  $childthemeData['URI'];
+		
 		}
 		
-		$framework_version = trim( $frameworkData['Version'] );
-		
+
 		if ( !$framework_version )
 			$framework_version = "unknown";
-
-		// WordPress 3.4 
-		if ( function_exists( 'wp_get_theme' ) ) {
-			$childthemeData = wp_get_theme( get_stylesheet_directory() . '/style.css' );
-		// WordPress 3.3
-		} else { 
-			$childthemeData = get_theme_data( get_stylesheet_directory() . '/style.css' );
-		}
-		
-		$childtheme_version = trim( $childthemeData['Version'] );
 		
 		if ( !$childtheme_version )
 			$childtheme_version = "unknown";
 
 		if ( !defined( 'THEMENAME' ) )
-			define( 'THEMENAME', 	$frameworkData['Title'] );
+			define( 'THEMENAME', 	$framework_title );
 
 		if ( !defined('THEMEAUTHOR') )
-			define( 'THEMEAUTHOR', 	$frameworkData['Author'] );
+			define( 'THEMEAUTHOR', 	$framework_author );
 
 		if ( !defined( 'THEMEURI') )
-			define( 'THEMEURI', 	$frameworkData['URI'] );
+			define( 'THEMEURI', 	$framework_themeuri );
 
 		if ( !defined( 'THEMATICVERSION' ) )
 			define( 'THEMATICVERSION', $framework_version );
 
-		define( 'TEMPLATENAME', 	$childthemeData['Title'] );
-		define( 'TEMPLATEAUTHOR', 	$childthemeData['Author'] );
-		define( 'TEMPLATEURI', 		$childthemeData['URI'] );
+		define( 'TEMPLATENAME', 	$childtheme_title );
+		define( 'TEMPLATEAUTHOR', 	$childtheme_author );
+		define( 'TEMPLATEURI', 		$childtheme_themeuri );
 		define( 'TEMPLATEVERSION', 	$childtheme_version );
 
 		// set feed links handling
