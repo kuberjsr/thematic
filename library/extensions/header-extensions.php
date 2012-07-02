@@ -81,7 +81,7 @@ if ( function_exists('childtheme_override_doctitle') )  {
  */
 function thematic_wptitle( $wp_doctitle, $separator, $sep_location ) { 
 	// return original string if on feed or if a seo plugin is being used
-    if ( is_feed() || thematic_seo() )
+    if ( is_feed() || !thematic_seo() )
     	return $wp_doctitle;
    	// otherwise...	
    	$site_name = get_bloginfo('name' , 'display');
@@ -210,37 +210,38 @@ function thematic_use_autoexcerpt() {
  * Filter: thematic_create_description
  */
 function thematic_create_description() {
-	$content = '';
-	if ( thematic_seo() ) {
-    	if ( is_single() || is_page() ) {
-      		if ( have_posts() ) {
-          		while ( have_posts() ) {
-            		the_post();
-					if ( thematic_the_excerpt() == "" ) {
-                        if ( thematic_use_autoexcerpt() ) {
-					    	$content = '<meta name="description" content="';
-                    		$content .= thematic_excerpt_rss();
-                    		$content .= '" />';
-                    		$content .= "\n";
-                        }
+	
+	if ( !thematic_seo() ) return;
+
+ 	if ( is_single() || is_page() ) {
+   		if ( have_posts() ) {
+       		while ( have_posts() ) {
+         		the_post();
+     				if ( thematic_the_excerpt() == "" ) {
+                      if ( thematic_use_autoexcerpt() ) {
+    			    	        $content = '<meta name="description" content="';
+                     		$content .= thematic_excerpt_rss();
+                     		$content .= '" />';
+                     		$content .= "\n";
+                      }
                 	} else {
-                        if ( thematic_use_excerpt() ) {
-                    		$content = '<meta name="description" content="';
-                    		$content .= thematic_the_excerpt();
-                    		$content .= '" />';
-                    		$content .= "\n";
-                        }
-                	}
-            	}
-        	}
-        } elseif ( is_home() || is_front_page() ) {
-    		$content = '<meta name="description" content="';
-    		$content .= get_bloginfo( 'description', 'display' );
-    		$content .= '" />';
-    		$content .= "\n";
-        }
-        echo apply_filters ('thematic_create_description', $content);
-	}
+                      if ( thematic_use_excerpt() ) {
+                     		$content = '<meta name="description" content="';
+                     		$content .= thematic_the_excerpt();
+                     		$content .= '" />';
+                     		$content .= "\n";
+                      }
+               	}
+         	}
+       }
+  } elseif ( is_home() || is_front_page() ) {
+   		$content = '<meta name="description" content="';
+   		$content .= get_bloginfo( 'description', 'display' );
+   		$content .= '" />';
+   		$content .= "\n";
+  }
+  echo apply_filters ('thematic_create_description', $content);
+	
 } // end thematic_create_description
 
 
@@ -268,20 +269,23 @@ function thematic_show_description() {
  * Filter: thematic_create_robots
  */
 function thematic_create_robots() {
-        global $paged;
-		if ( thematic_seo() ) {
-    		if ( ( is_home() && ( $paged < 2 ) ) || is_front_page() || is_single() || is_page() || is_attachment() ) {
-				$content = '<meta name="robots" content="index,follow" />';
-    		} elseif ( is_search() ) {
-        		$content = '<meta name="robots" content="noindex,nofollow" />';
-    		} else {	
-        		$content = '<meta name="robots" content="noindex,follow" />';
-    		}
-    		$content .= "\n";
-    		if ( get_option('blog_public') ) {
-    				echo apply_filters('thematic_create_robots', $content);
-    		}
-		}
+
+  if ( !thematic_seo() ) return;
+
+  global $paged;
+
+	if ( ( is_home() && ( $paged < 2 ) ) || is_front_page() || is_single() || is_page() || is_attachment() ) {
+		$content = '<meta name="robots" content="index,follow" />';
+	} elseif ( is_search() ) {
+ 		$content = '<meta name="robots" content="noindex,nofollow" />';
+	} else {	
+ 		$content = '<meta name="robots" content="noindex,follow" />';
+	}
+	$content .= "\n";
+	if ( get_option('blog_public') ) {
+		echo apply_filters('thematic_create_robots', $content);
+	}
+
 } // end thematic_create_robots
 
 
